@@ -53,7 +53,7 @@ userSchema.statics.signup = async function (firstName, lastName, role, email, pa
 
     const user = await this.create({ 
         first_name: firstName,
-        last_name: firstName,
+        last_name: lastName,
         role: role,
         email: email, 
         password: hash
