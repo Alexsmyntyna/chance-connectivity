@@ -25,3 +25,5 @@ mongoose.connect(process.env.MONGODB)
     .catch((error) => {
         console.log("error is ", error)
     });
+
+module.exports = app;
