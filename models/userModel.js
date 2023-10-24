@@ -18,6 +18,19 @@ const userSchema = new Schema({
         required: true,
         enum: ["participant", "leader"]
     },
+    city: {
+        type: String,
+        required: true,
+    },
+    age: {
+        type: Number,
+        required: true,
+    },
+    sex: {
+        type: String,
+        required: true,
+        enum: ["male", "female"]
+    },
     email: {
         type: String,
         required: true
@@ -28,18 +41,21 @@ const userSchema = new Schema({
     }
 });
 
-userSchema.statics.signup = async function (firstName, lastName, role, email, password) {
-    if (!firstName || !lastName || !role || !email || !password) {
+userSchema.statics.signup = async function (firstName, lastName, role, city, age, sex, email, password) {
+    if (!firstName || !lastName || !role || !city || !age || !sex  || !email || !password) {
         throw Error("All fields must be filled");
     }
     if (!validator.isEmail(email)) {
         throw Error("Email is not valid");
     }
     if (!validator.isStrongPassword(password)) {
-        throw Error("Password is not strong")
+        throw Error("Password is not strong");
     }
     if (role != "participant" && role != "leader") {
-        throw Error("Role is not correct")
+        throw Error("Role is not correct");
+    }
+    if (sex != "male" && sex != "female") {
+        throw Error("Sex is not correct");
     }
 
     const exists = await this.findOne({ email });
@@ -54,8 +70,11 @@ userSchema.statics.signup = async function (firstName, lastName, role, email, pa
     const user = await this.create({ 
         first_name: firstName,
         last_name: lastName,
-        role: role,
-        email: email, 
+        role,
+        city,
+        age,
+        sex,
+        email, 
         password: hash
     });
 
