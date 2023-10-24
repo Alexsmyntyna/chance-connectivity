@@ -10,7 +10,9 @@ router.use(requireAuth);
 
 // profile info
 router.get("/", getProfile);
+// edit profile
 router.patch("/edit", editProfile);
+// change password
 router.patch("/change-password", changePassword);
 
 module.exports = router;
