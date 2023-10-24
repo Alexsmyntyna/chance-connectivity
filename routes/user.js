@@ -8,8 +8,8 @@ const {
 const router = express.Router();
 
 // sign up
-router.post('/signup', signupUser);
+router.post("/signup", signupUser);
 // login
-router.post('/login', loginUser);
+router.post("/login", loginUser);
 
 module.exports = router;

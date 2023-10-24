@@ -19,7 +19,7 @@ const getProfile = async (req, res) => {
     const user_id = req.user;
 
     try {
-        const user = await User.findById({ user_id }).select(["-password", "-__v"]);
+        const user = await User.findById(user_id).select(["-password", "-__v"]);
         res.status(200).json(user);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -29,9 +29,9 @@ const getProfile = async (req, res) => {
 // edit profile
 const editProfile = async (req, res) => {
     const user_id = req.user;
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, city, age, sex, email } = req.body;
 
-    if (!firstName || !lastName) {
+    if (!firstName || !lastName || !city || !age || !sex) {
         return res.status(400).json({ error: "All fields must be filled" });
     }
 
@@ -53,9 +53,16 @@ const editProfile = async (req, res) => {
                 return res.status(400).json({ error: "Email already in use" });
             }
         }
+
+        if (sex != "male" && sex != "female") {
+            throw Error("Sex is not correct");
+        }
         
         user.first_name = firstName;
         user.last_name = lastName;
+        user.city = city;
+        user.age = age;
+        user.sex = sex;
         user.email = email;
         await user.save();
 
