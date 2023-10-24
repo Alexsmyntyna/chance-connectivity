@@ -13,6 +13,19 @@ const getEvents = async (req, res) => {
     }
 }
 
+// get exact event method
+const getEvent = async (req, res) => {
+    const { _id } = req.user;
+    const event_id = req.params.id;
+
+    try {
+        const event = await Event.findOne({user_id: _id, _id: event_id}).select(["-__v"]);
+        res.status(200).json({event});
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 // create event method
 const createEvent = async (req, res) => {
     const { eventName, country, startDate, endDate } = req.body;
@@ -20,6 +33,18 @@ const createEvent = async (req, res) => {
 
     try {
         const event = await Event.createEvent(eventName, country, startDate, endDate, _id);
+        res.status(201).json({event});
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+};
+
+// update event method
+const updateEvent = async (req, res) => {
+    const { _id } = req.user;
+
+    try {
+        const event = await Event.updateEvent(req.params.id, _id, req.body);
         res.status(200).json({event});
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -28,5 +53,7 @@ const createEvent = async (req, res) => {
 
 module.exports = {
     getEvents,
-    createEvent
+    getEvent,
+    createEvent,
+    updateEvent
 };

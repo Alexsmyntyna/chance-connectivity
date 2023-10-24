@@ -24,10 +24,35 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true
+    },
+    description: {
+        type: String
+    },
+    capacity: {
+        type: Number
+    },
+    ticket_start_sale_date: {
+        type: Date
+    },
+    ticket_end_sale_date: {
+        type: Date
+    },
+    ticket_price: {
+        type: Number
+    },
+    ticket_currency: {
+        type: String,
+        enum: ["usdollar", "euro", "belrubles"]
+    },
+    age_min: {
+        type: Number
+    },
+    age_max: {
+        type: Number
     }
 });
 
-eventSchema.statics.createEvent = async function (eventName, country, startDate, endDate, user_id) {
+function validateFields(eventName, country, startDate, endDate, user_id) {
     if (!eventName || !country || !startDate || !endDate || !user_id) {
         throw Error("All fields must be filled");
     }
@@ -42,15 +67,34 @@ eventSchema.statics.createEvent = async function (eventName, country, startDate,
         throw Error("End Date should be after Start Date");
     }
 
+    return {
+        startDate: startDate,
+        endDate: endDate
+    };
+}
+
+eventSchema.statics.createEvent = async function (eventName, country, startDate, endDate, user_id) {
+    
+    validateData = validateFields(eventName, country, startDate, endDate, user_id);
+
     const event = await this.create({ 
         event_name: eventName,
         country,
-        start_date: startDate,
-        end_date: endDate,
-        user_id
+        start_date: validateData.startDate,
+        end_date: validateData.endDate,
+        user_id,
     });
 
     return event;
+}
+
+eventSchema.statics.updateEvent = async function (event_id, user_id, fields) {
+    const filter = {_id: event_id, user_id};
+    if(fields.ticket_currency && !["usdollar", "euro", "belrubles"].includes(fields.ticket_currency)){
+        throw Error("Wrong currency");
+    }
+    await this.findOneAndUpdate(filter, fields);
+    return await this.findOne(filter);
 }
 
 module.exports = mongoose.model("Event", eventSchema);
