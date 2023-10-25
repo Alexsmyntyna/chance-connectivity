@@ -41,8 +41,8 @@ const userSchema = new Schema({
     }
 });
 
-userSchema.statics.signup = async function (firstName, lastName, role, city, age, sex, email, password) {
-    if (!firstName || !lastName || !role || !city || !age || !sex  || !email || !password) {
+userSchema.statics.signup = async function (first_name, last_name, role, city, age, sex, email, password) {
+    if (!first_name || !last_name || !role || !city || !age || !sex  || !email || !password) {
         throw Error("All fields must be filled");
     }
     if (!validator.isEmail(email)) {
@@ -69,9 +69,9 @@ userSchema.statics.signup = async function (firstName, lastName, role, city, age
         cost: 10
     });
 
-    const user = await this.create({ 
-        first_name: firstName,
-        last_name: lastName,
+    return await this.create({
+        first_name,
+        last_name,
         role,
         city,
         age,
@@ -79,8 +79,6 @@ userSchema.statics.signup = async function (firstName, lastName, role, city, age
         email, 
         password: hash
     });
-
-    return user;
 }
 
 userSchema.statics.login = async function(email, password) {

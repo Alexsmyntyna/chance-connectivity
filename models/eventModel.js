@@ -75,17 +75,15 @@ function validateFields(eventName, country, startDate, endDate, user_id) {
 
 eventSchema.statics.createEvent = async function (eventName, country, startDate, endDate, user_id) {
     
-    validateData = validateFields(eventName, country, startDate, endDate, user_id);
+    const validateData = validateFields(eventName, country, startDate, endDate, user_id);
 
-    const event = await this.create({ 
+    return await this.create({
         event_name: eventName,
         country,
         start_date: validateData.startDate,
         end_date: validateData.endDate,
         user_id,
     });
-
-    return event;
 }
 
 eventSchema.statics.updateEvent = async function (event_id, user_id, fields) {
