@@ -31,7 +31,7 @@ const editProfile = async (req, res) => {
     try {
         await User.findOneAndUpdate(user_id, req.body);
         const data = await User.findById(user_id).select(["-password", "-__v"]);
-        res.status(200).json({ data });
+        res.status(200).json(data);
     } catch (error) {
         res.status(400).json({ error });
     }

@@ -44,8 +44,8 @@ describe("PATCH /api/profile/edit", () => {
             .patch("/api/profile/edit")
             .set("Authorization", "Bearer " + token)
             .send({
-                firstName: "TestFirst1",
-                lastName: "TestLast1",
+                first_name: "TestFirst1",
+                last_name: "TestLast1",
                 city: "CityTest1",
                 age: 19,
                 sex: "female",
