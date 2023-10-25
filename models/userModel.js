@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const validator = require("validator");
+
 
 const Schema = mongoose.Schema;
 
@@ -64,8 +64,10 @@ userSchema.statics.signup = async function (firstName, lastName, role, city, age
         throw Error("Email already in use");
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    const hash = await Bun.password.hash(password, {
+        algorithm: "bcrypt",
+        cost: 10
+    });
 
     const user = await this.create({ 
         first_name: firstName,
@@ -95,7 +97,7 @@ userSchema.statics.login = async function(email, password) {
         throw Error("Incorrect email");
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await Bun.password.verify(password, user.password);
 
     if (!match) {
         throw Error("Incorrect password");
