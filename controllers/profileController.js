@@ -1,7 +1,6 @@
 // declare dependencies
 const User = require("../models/userModel");
 const validator = require("validator");
-const bcrypt = require("bcrypt");
 
 async function findUserById(userId) {
     return await User.findById(userId);
@@ -85,13 +84,15 @@ const changePassword = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        const match = await bcrypt.compare(oldPassword, user.password);
+        const match = await Bun.password.verify(oldPassword, user.password);
         if (!match) {
             return res.status(400).json({ error: "Incorrect old password" });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(newPassword, salt);
+        const hash = await Bun.password.hash(newPassword, {
+            algorithm: "bcrypt",
+            cost: 10
+        });
         user.password = hash;
         await user.save();
 

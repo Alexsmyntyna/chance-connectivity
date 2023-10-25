@@ -11,7 +11,10 @@ describe("POST /api/user/signup", () => {
                     lastName: "TestLast",
                     role: "leader",
                     email: "admintestemail1029385@admin.com",
-                    password: "Temppass12!"
+                    password: "Temppass12!",
+                    city: "CityTest",
+                    age: 18,
+                    sex: "male",
                 });
 
         expect(response.status).toBe(200);

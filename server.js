@@ -5,8 +5,6 @@ const userRoutes = require("./routes/user");
 const profileRoutes = require("./routes/profile");
 const eventRoutes = require("./routes/event");
 
-require("dotenv").config();
-
 const app = express();
 
 // add base middleware
