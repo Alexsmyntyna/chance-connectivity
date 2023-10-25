@@ -96,9 +96,7 @@ const changePassword = async (req, res) => {
         user.password = hash;
         await user.save();
 
-        const updatedUser = cleanUserObject(user);
-
-        res.status(200).json(updatedUser);
+        res.status(200).json({ message: "Your password has been successfully changed!" });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
