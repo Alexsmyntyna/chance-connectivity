@@ -51,9 +51,25 @@ const updateEvent = async (req, res) => {
     }
 };
 
+// delete event method
+const deleteEvent = async (req, res) => {
+    const user_id = req.user._id;
+
+    try {
+        const event = await Event.findOneAndDelete({ _id: req.params.id, user_id });
+        if (!event) {
+            res.status(200).json({ message: "Your event has already removed or event_id is wrong"});
+        }
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 module.exports = {
     getEvents,
     getEvent,
     createEvent,
-    updateEvent
+    updateEvent,
+    deleteEvent
 };
