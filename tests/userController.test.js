@@ -13,8 +13,8 @@ describe("POST /api/user/signup", () => {
         const response = await request(app)
             .post("/api/user/signup")
             .send({
-                    firstName: "TestFirst",
-                    lastName: "TestLast",
+                    first_name: "TestFirst",
+                    last_name: "TestLast",
                     role: "leader",
                     email,
                     password: "Temppass12!",

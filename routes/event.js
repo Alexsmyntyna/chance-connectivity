@@ -14,6 +14,6 @@ router.get("/:id", getEvent);
 // create new event
 router.post("/create", createEvent);
 // update event
-router.post("/update/:id", updateEvent);
+router.patch("/update/:id", updateEvent);
 
 module.exports = router;

@@ -20,7 +20,7 @@ const getEvent = async (req, res) => {
 
     try {
         const event = await Event.findOne({user_id: _id, _id: event_id}).select(["-__v"]);
-        res.status(200).json({event});
+        res.status(200).json(event);
     } catch (error) {
         res.status(400).json({error: error.message});
     }
@@ -28,12 +28,12 @@ const getEvent = async (req, res) => {
 
 // create event method
 const createEvent = async (req, res) => {
-    const { eventName, country, startDate, endDate } = req.body;
+    const { event_name, country, start_date, end_date } = req.body;
     const { _id } = req.user;
 
     try {
-        const event = await Event.createEvent(eventName, country, startDate, endDate, _id);
-        res.status(201).json({event});
+        const event = await Event.createEvent(event_name, country, start_date, end_date, _id);
+        res.status(201).json(event);
     } catch (error) {
         res.status(400).json({error: error.message});
     }
@@ -45,7 +45,7 @@ const updateEvent = async (req, res) => {
 
     try {
         const event = await Event.updateEvent(req.params.id, _id, req.body);
-        res.status(200).json({event});
+        res.status(200).json(event);
     } catch (error) {
         res.status(400).json({error: error.message});
     }
