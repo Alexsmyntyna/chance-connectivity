@@ -135,6 +135,19 @@ describe("PATCH /api/event/event_id/add-user", () => {
     });
 });
 
+describe("GET /api/event/event_id/list", () => {
+    it("should get list of all users of event", async () => {
+        const newEmail = new Date().getTime() + email;
+        const response = await request(app)
+            .get("/api/event/" + event_id + "/list")
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("usersList");
+        expect(response.body.usersList).toHaveLength(1);
+    });
+});
+
 describe("DELETE /api/event/event_id/delete-user/user_id", () => {
     it("should delete user from event", async () => {
         const newEmail = new Date().getTime() + email;

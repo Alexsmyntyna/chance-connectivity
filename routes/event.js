@@ -8,6 +8,7 @@ const {
     updateEvent,
     deleteEvent,
     addNewUser,
+    getAllUsersOfEvent,
     deleteUserFromEvent
 } = require("../controllers/eventController");
 
@@ -21,6 +22,8 @@ router.get("/", getEvents);
 router.get("/:id", getEvent);
 // add new user to event
 router.patch("/:id/add-user", addNewUser);
+// get all users of events
+router.get("/:id/list", getAllUsersOfEvent);
 // delete user from event
 router.delete("/:id/delete-user/:user_id", deleteUserFromEvent);
 // create new event

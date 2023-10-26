@@ -67,6 +67,7 @@ const deleteEvent = async (req, res) => {
     }
 }
 
+// add new user to event method
 const addNewUser = async (req, res) => {
     const user_id = req.user._id;
     const { first_name, last_name, role, city, age, sex, email, password } = req.body;
@@ -89,6 +90,24 @@ const addNewUser = async (req, res) => {
     }
 }
 
+// get all users of event
+const getAllUsersOfEvent = async (req, res) => {
+    const user_id = req.user._id;
+
+    try {
+        const event = await Event.findOne({ _id: req.params.id, user_id });
+
+        if (event) {
+            const usersList = await User.find({ _id: { $in: event.participant_ids } });
+            res.status(200).json({ usersList });
+        }
+        res.status(404).json({ message: "Event has not found" });
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+};
+
+// delete new user from event method
 const deleteUserFromEvent = async (req, res) => {
     const leader_id = req.user._id;
     const delete_user_id = req.params.user_id;
@@ -117,5 +136,6 @@ module.exports = {
     updateEvent,
     deleteEvent,
     addNewUser,
+    getAllUsersOfEvent,
     deleteUserFromEvent
 };
