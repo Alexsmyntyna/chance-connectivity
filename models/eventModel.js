@@ -49,6 +49,9 @@ const eventSchema = new Schema({
     },
     age_max: {
         type: Number
+    },
+    participant_ids: {
+        type:  [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
     }
 });
 

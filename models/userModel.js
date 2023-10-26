@@ -38,6 +38,9 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    event_ids: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }]
     }
 });
 

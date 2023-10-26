@@ -100,6 +100,63 @@ describe("PATCH /api/event/update/event_id", () => {
     });
 });
 
+describe("PATCH /api/event/event_id/add-user", () => {
+    it("should add new user to event", async () => {
+        const newEmail = new Date().getTime() + email;
+        const response = await request(app)
+            .patch("/api/event/" + event_id + "/add-user")
+            .set("Authorization", "Bearer " + token)
+            .send({
+                first_name: "TestFirst",
+                last_name: "TestLast",
+                role: "participant",
+                email: newEmail,
+                password: "Temppass12!",
+                city: "CityTest",
+                age: 18,
+                sex: "male",
+            });
+
+        const getUser = await User.findOne({ email: newEmail });
+        global.newEventUser = getUser._id.toString();
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("event_name", "TestEvent1");
+        expect(response.body).toHaveProperty("country", "TestCountry1");
+        expect(response.body).toHaveProperty("description", "testDescription");
+        expect(response.body).toHaveProperty("capacity", 200);
+        expect(response.body).toHaveProperty("ticket_price", 100);
+        expect(response.body).toHaveProperty("ticket_currency", "usdollar");
+        expect(response.body).toHaveProperty("age_min", 18);
+        expect(response.body).toHaveProperty("age_max", 40);
+        expect(response.body).toHaveProperty("user_id", user_id);
+        expect(response.body).toHaveProperty("participant_ids");
+        expect(response.body.participant_ids).toHaveLength(1);
+        expect(response.body.participant_ids).toEqual([newEventUser]);
+    });
+});
+
+describe("DELETE /api/event/event_id/delete-user/user_id", () => {
+    it("should delete user from event", async () => {
+        const newEmail = new Date().getTime() + email;
+        const response = await request(app)
+            .delete("/api/event/" + event_id + "/delete-user/" + newEventUser)
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("event_name", "TestEvent1");
+        expect(response.body).toHaveProperty("country", "TestCountry1");
+        expect(response.body).toHaveProperty("description", "testDescription");
+        expect(response.body).toHaveProperty("capacity", 200);
+        expect(response.body).toHaveProperty("ticket_price", 100);
+        expect(response.body).toHaveProperty("ticket_currency", "usdollar");
+        expect(response.body).toHaveProperty("age_min", 18);
+        expect(response.body).toHaveProperty("age_max", 40);
+        expect(response.body).toHaveProperty("user_id", user_id);
+        expect(response.body).toHaveProperty("participant_ids");
+        expect(response.body.participant_ids).toHaveLength(0);
+    });
+});
+
 describe("DELETE /api/event/delete/event_id", () => {
     it("should delete event", async () => {
         const response = await request(app)

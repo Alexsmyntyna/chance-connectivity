@@ -1,5 +1,6 @@
 // declare dependencies
 const Event = require("../models/eventModel");
+const User = require("../models/userModel");
 
 // get events method
 const getEvents = async (req, res) => {
@@ -66,10 +67,55 @@ const deleteEvent = async (req, res) => {
     }
 }
 
+const addNewUser = async (req, res) => {
+    const user_id = req.user._id;
+    const { first_name, last_name, role, city, age, sex, email, password } = req.body;
+
+    try {
+        const event = await Event.findOne({ _id: req.params.id, user_id });
+        if (event) {
+            const newUser = await User.signup(first_name, last_name, role, city, age, sex, email, password);
+
+            newUser.event_ids.push(req.params.id);
+            event.participant_ids.push(newUser._id);
+
+            await event.save();
+            await newUser.save();
+            res.status(200).json(event);
+        }
+        res.status(404).json({ message: "Event has not found" });
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+const deleteUserFromEvent = async (req, res) => {
+    const leader_id = req.user._id;
+    const delete_user_id = req.params.user_id;
+
+    try {
+        const event = await Event.findOne({ _id: req.params.id, user_id: leader_id });
+
+        if (event) {
+            const indexOfUser = event.participant_ids.indexOf(delete_user_id);
+            if (indexOfUser != -1) {
+                event.participant_ids.splice(indexOfUser, 1);
+                await event.save();
+            }
+            res.status(200).json(event);
+        }
+        res.status(404).json({ message: "Event has not found" });
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 module.exports = {
     getEvents,
     getEvent,
     createEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    addNewUser,
+    deleteUserFromEvent
 };
