@@ -100,7 +100,25 @@ describe("PATCH /api/event/update/event_id", () => {
     });
 });
 
+describe("DELETE /api/event/delete/event_id", () => {
+    it("should delete event", async () => {
+        const response = await request(app)
+            .delete("/api/event/delete/" + event_id)
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("event_name", "TestEvent1");
+        expect(response.body).toHaveProperty("country", "TestCountry1");
+        expect(response.body).toHaveProperty("description", "testDescription");
+        expect(response.body).toHaveProperty("capacity", 200);
+        expect(response.body).toHaveProperty("ticket_price", 100);
+        expect(response.body).toHaveProperty("ticket_currency", "usdollar");
+        expect(response.body).toHaveProperty("age_min", 18);
+        expect(response.body).toHaveProperty("age_max", 40);
+        expect(response.body).toHaveProperty("user_id", user_id);
+    });
+});
+
 afterAll(async () => {
     await User.deleteOne({ email });
-    await Event.deleteOne({ _id: event_id });
 });
