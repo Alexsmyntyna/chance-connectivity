@@ -52,36 +52,36 @@ const eventSchema = new Schema({
     }
 });
 
-function validateFields(eventName, country, startDate, endDate, user_id) {
-    if (!eventName || !country || !startDate || !endDate || !user_id) {
+function validateFields(event_name, country, start_date, end_date, user_id) {
+    if (!event_name || !country || !start_date || !end_date || !user_id) {
         throw Error("All fields must be filled");
     }
 
-    startDate = new Date(startDate);
-    endDate = new Date(endDate);
+    start_date = new Date(start_date);
+    end_date = new Date(end_date);
 
-    if (!validator.isDate(startDate) && !validator.isDate(endDate)) {
+    if (!validator.isDate(start_date) && !validator.isDate(end_date)) {
         throw Error("Date should be in format 2023-10-01T21:00:00.000+00:00");
     }
-    if (startDate >= endDate) {
+    if (start_date >= end_date) {
         throw Error("End Date should be after Start Date");
     }
 
     return {
-        startDate: startDate,
-        endDate: endDate
+        start_date,
+        end_date
     };
 }
 
-eventSchema.statics.createEvent = async function (eventName, country, startDate, endDate, user_id) {
+eventSchema.statics.createEvent = async function (event_name, country, start_date, end_date, user_id) {
     
-    const validateData = validateFields(eventName, country, startDate, endDate, user_id);
+    const validateData = validateFields(event_name, country, start_date, end_date, user_id);
 
     return await this.create({
-        event_name: eventName,
+        event_name,
         country,
-        start_date: validateData.startDate,
-        end_date: validateData.endDate,
+        start_date: validateData.start_date,
+        end_date: validateData.end_date,
         user_id,
     });
 }
