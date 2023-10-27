@@ -67,8 +67,8 @@ describe("PATCH /api/profile/change-password", () => {
             .patch("/api/profile/change-password")
             .set("Authorization", "Bearer " + token)
             .send({
-                oldPassword: "Temppass12!",
-                newPassword: "Temppass1!"
+                old_password: "Temppass12!",
+                new_password: "Temppass1!"
             });
 
         expect(response.status).toBe(200);

@@ -42,7 +42,7 @@ const eventSchema = new Schema({
     },
     ticket_currency: {
         type: String,
-        enum: ["usdollar", "euro", "belrubles"]
+        enum: ["usdollar", "euro", "belruble"]
     },
     age_min: {
         type: Number
@@ -91,7 +91,7 @@ eventSchema.statics.createEvent = async function (event_name, country, start_dat
 
 eventSchema.statics.updateEvent = async function (event_id, user_id, fields) {
     const filter = {_id: event_id, user_id};
-    if(fields.ticket_currency && !["usdollar", "euro", "belrubles"].includes(fields.ticket_currency)){
+    if(fields.ticket_currency && !["usdollar", "euro", "belruble"].includes(fields.ticket_currency)){
         throw Error("Wrong currency");
     }
     await this.findOneAndUpdate(filter, fields);

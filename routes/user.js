@@ -2,7 +2,7 @@
 const express = require("express");
 const {
     signupUser,
-    loginUser
+    signinUser
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -10,6 +10,6 @@ const router = express.Router();
 // sign up
 router.post("/signup", signupUser);
 // login
-router.post("/login", loginUser);
+router.post("/signin", signinUser);
 
 module.exports = router;
