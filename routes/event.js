@@ -5,6 +5,7 @@ const {
     createEvent,
     getEvents,
     getEvent,
+    importEvent,
     updateEvent,
     deleteEvent,
     addNewUser,
@@ -20,6 +21,8 @@ router.use(requireAuth);
 router.get("/", getEvents);
 // get exact event
 router.get("/:id", getEvent);
+// import event
+router.post("/import", importEvent);
 // add new user to event
 router.patch("/:id/add-user", addNewUser);
 // get all users of events
