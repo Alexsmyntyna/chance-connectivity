@@ -1,6 +1,7 @@
 // declare dependencies
 const Event = require("../models/eventModel");
 const User = require("../models/userModel");
+const axios = require("axios");
 
 /**
  * @swagger
@@ -37,10 +38,10 @@ const User = require("../models/userModel");
  *               error: "You have an error"
  */
 const getEvents = async (req, res) => {
-    const { _id } = req.user;
+    const user_id = req.user._id;
 
     try {
-        const events = await Event.where({user_id: _id}).select(["-__v"]);
+        const events = await Event.where({ user_id }).select(["-__v"]);
         res.status(200).json({events});
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -86,12 +87,80 @@ const getEvents = async (req, res) => {
  *               error: "You have an error"
  */
 const getEvent = async (req, res) => {
-    const { _id } = req.user;
+    const user_id = req.user._id;
     const event_id = req.params.id;
 
     try {
-        const event = await Event.findOne({user_id: _id, _id: event_id}).select(["-__v"]);
+        const event = await Event.findOne({user_id, _id: event_id}).select(["-__v"]);
         res.status(200).json(event);
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+/**
+ * @swagger
+ * /api/event/import:
+ *   post:
+ *     summary: Import external event.
+ *     tags:
+ *       - Events
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: url
+ *         description: Link to external event.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: country
+ *         description: Country of event.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful import of event.
+ *         content:
+ *           application/json:
+ *             example:
+ *                 participant_ids: []
+ *                 _id: "your-unique-event-id"
+ *                 event_name: "TestEvent"
+ *                 country: "USA"
+ *                 start_date: "2023-10-01T17:00:00.000Z"
+ *                 end_date: "2023-10-01T19:00:00.000Z"
+ *                 user_id: "your-unique-user-id"
+ *                 logo: "data:image/svg+xml;base64..."
+ *                 external_id: "external_event_id"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const importEvent = async (req, res) => {
+    const user_id = req.user._id;
+    const { country, url } = req.body;
+
+    try {
+        axios.get(url)
+            .then(async response => {
+                const { name: event_name, startDate: start_date, endDate: end_date } = response.data;
+                const fields = {
+                    logo: response.data.landingLogoImage,
+                    external_id: response.data.id
+                };
+                const result = await Event.createEvent(event_name, country, start_date, end_date, user_id, fields);
+                res.status(200).json(result);
+            })
+            .catch(error => {
+                res.status(400).json({error: error.message});
+            })
     } catch (error) {
         res.status(400).json({error: error.message});
     }
@@ -192,10 +261,10 @@ const getEvent = async (req, res) => {
  */
 const createEvent = async (req, res) => {
     const { event_name, country, start_date, end_date } = req.body;
-    const { _id } = req.user;
+    const user_id = req.user._id;
 
     try {
-        const event = await Event.createEvent(event_name, country, start_date, end_date, _id);
+        const event = await Event.createEvent(event_name, country, start_date, end_date, user_id);
         res.status(201).json(event);
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -301,10 +370,10 @@ const createEvent = async (req, res) => {
  *               error: "You have an error"
  */
 const updateEvent = async (req, res) => {
-    const { _id } = req.user;
+    const user_id = req.user._id;
 
     try {
-        const event = await Event.updateEvent(req.params.id, _id, req.body);
+        const event = await Event.updateEvent(req.params.id, user_id, req.body);
         res.status(200).json(event);
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -611,6 +680,7 @@ const deleteUserFromEvent = async (req, res) => {
 module.exports = {
     getEvents,
     getEvent,
+    importEvent,
     createEvent,
     updateEvent,
     deleteEvent,

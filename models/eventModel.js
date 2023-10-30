@@ -25,6 +25,12 @@ const eventSchema = new Schema({
         ref: "User",
         required: true
     },
+    logo: {
+        type: String
+    },
+    external_id: {
+        type: Number
+    },
     description: {
         type: String
     },
@@ -76,17 +82,30 @@ function validateFields(event_name, country, start_date, end_date, user_id) {
     };
 }
 
-eventSchema.statics.createEvent = async function (event_name, country, start_date, end_date, user_id) {
+eventSchema.statics.createEvent = async function (event_name, country, start_date, end_date, user_id, fields = []) {
     
     const validateData = validateFields(event_name, country, start_date, end_date, user_id);
 
-    return await this.create({
+    if(fields.ticket_currency && !["usdollar", "euro", "belruble"].includes(fields.ticket_currency)){
+        throw Error("Wrong currency");
+    }
+
+    let data = {
         event_name,
         country,
         start_date: validateData.start_date,
         end_date: validateData.end_date,
         user_id,
-    });
+    };
+
+    if (fields) {
+        data = {
+            ...data,
+            ...fields
+        }
+    }
+
+    return this.create(data);
 }
 
 eventSchema.statics.updateEvent = async function (event_id, user_id, fields) {
