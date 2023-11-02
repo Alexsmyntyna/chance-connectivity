@@ -98,6 +98,48 @@ const getEvent = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /api/event/subscribe/{id}:
+ *   patch:
+ *     summary: Toggle subscription to the event.
+ *     tags:
+ *       - Events
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: id
+ *         description: ID of event.
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful subscribe/unsubscribe to the event.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "6542bec72b8026458b9b0a6a"
+ *               first_name: "Test"
+ *               last_name: "Test"
+ *               role: "leader"
+ *               city: "testcity"
+ *               age: 18
+ *               sex: "male"
+ *               email: "test@test.com"
+ *               event_ids: [
+ *                 6543b060f067c4258e505681
+ *              ]
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
 const toggleSubscribeEvent = async (req, res) => {
     const user_id = req.user._id;
     const event_id = req.params.id;

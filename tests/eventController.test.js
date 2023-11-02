@@ -137,7 +137,6 @@ describe("PATCH /api/event/event_id/add-user", () => {
 
 describe("GET /api/event/event_id/list", () => {
     it("should get list of all users of event", async () => {
-        const newEmail = new Date().getTime() + email;
         const response = await request(app)
             .get("/api/event/" + event_id + "/list")
             .set("Authorization", "Bearer " + token);
@@ -150,7 +149,6 @@ describe("GET /api/event/event_id/list", () => {
 
 describe("DELETE /api/event/event_id/delete-user/user_id", () => {
     it("should delete user from event", async () => {
-        const newEmail = new Date().getTime() + email;
         const response = await request(app)
             .delete("/api/event/" + event_id + "/delete-user/" + newEventUser)
             .set("Authorization", "Bearer " + token);
@@ -167,6 +165,42 @@ describe("DELETE /api/event/event_id/delete-user/user_id", () => {
         expect(response.body).toHaveProperty("user_id", user_id);
         expect(response.body).toHaveProperty("participant_ids");
         expect(response.body.participant_ids).toHaveLength(0);
+    });
+});
+
+describe("PATCH /api/event/subscribe/event_id", () => {
+    it("should subscribe to the event", async () => {
+        const response = await request(app)
+            .patch("/api/event/subscribe/" + event_id)
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("first_name", "TestFirst");
+        expect(response.body).toHaveProperty("last_name", "TestLast");
+        expect(response.body).toHaveProperty("role", "leader");
+        expect(response.body).toHaveProperty("city", "CityTest");
+        expect(response.body).toHaveProperty("age", 18);
+        expect(response.body).toHaveProperty("sex", "male");
+        expect(response.body).toHaveProperty("email", email);
+        expect(response.body).toHaveProperty("event_ids", [event_id]);
+    });
+});
+
+describe("PATCH /api/event/subscribe/event_id", () => {
+    it("should unsubscribe to the event", async () => {
+        const response = await request(app)
+            .patch("/api/event/subscribe/" + event_id)
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("first_name", "TestFirst");
+        expect(response.body).toHaveProperty("last_name", "TestLast");
+        expect(response.body).toHaveProperty("role", "leader");
+        expect(response.body).toHaveProperty("city", "CityTest");
+        expect(response.body).toHaveProperty("age", 18);
+        expect(response.body).toHaveProperty("sex", "male");
+        expect(response.body).toHaveProperty("email", email);
+        expect(response.body).toHaveProperty("event_ids", []);
     });
 });
 
