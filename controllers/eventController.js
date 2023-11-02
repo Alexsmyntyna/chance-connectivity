@@ -98,6 +98,43 @@ const getEvent = async (req, res) => {
     }
 }
 
+const toggleSubscribeEvent = async (req, res) => {
+    const user_id = req.user._id;
+    const event_id = req.params.id;
+
+    try {
+        const [event, user] = await Promise.all([
+            Event.findOne({ _id: event_id }),
+            User.findOne({ _id: user_id }).select("-password")
+        ]);
+
+        if (!event && !user) {
+            res.status(400).json({error: "Event id or user id is wrong"});
+        }
+
+        const indexOfEvent = user.event_ids.indexOf(event_id);
+        const indexOfUser = event.participant_ids.indexOf(user_id);
+
+        if (indexOfUser !== -1 && indexOfEvent !== -1) {
+            event.participant_ids.splice(indexOfUser, 1);
+            user.event_ids.splice(indexOfEvent, 1);
+        } else {
+            event.participant_ids.push(user_id);
+            user.event_ids.push(event_id);
+        }
+
+        await Promise.all([
+            user.save(),
+            event.save()
+        ]);
+
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 /**
  * @swagger
  * /api/event/import:
@@ -665,7 +702,7 @@ const deleteUserFromEvent = async (req, res) => {
 
         if (event) {
             const indexOfUser = event.participant_ids.indexOf(delete_user_id);
-            if (indexOfUser != -1) {
+            if (indexOfUser !== -1) {
                 event.participant_ids.splice(indexOfUser, 1);
                 await event.save();
             }
@@ -680,6 +717,7 @@ const deleteUserFromEvent = async (req, res) => {
 module.exports = {
     getEvents,
     getEvent,
+    toggleSubscribeEvent,
     importEvent,
     createEvent,
     updateEvent,
