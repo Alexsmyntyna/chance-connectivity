@@ -100,6 +100,85 @@ const getEvent = async (req, res) => {
 
 /**
  * @swagger
+ * /api/event/subscribe/{id}:
+ *   patch:
+ *     summary: Toggle subscription to the event.
+ *     tags:
+ *       - Events
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: id
+ *         description: ID of event.
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful subscribe/unsubscribe to the event.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "6542bec72b8026458b9b0a6a"
+ *               first_name: "Test"
+ *               last_name: "Test"
+ *               role: "leader"
+ *               city: "testcity"
+ *               age: 18
+ *               sex: "male"
+ *               email: "test@test.com"
+ *               event_ids: [
+ *                 6543b060f067c4258e505681
+ *              ]
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const toggleSubscribeEvent = async (req, res) => {
+    const user_id = req.user._id;
+    const event_id = req.params.id;
+
+    try {
+        const [event, user] = await Promise.all([
+            Event.findOne({ _id: event_id }),
+            User.findOne({ _id: user_id }).select("-password")
+        ]);
+
+        if (!event && !user) {
+            res.status(400).json({error: "Event id or user id is wrong"});
+        }
+
+        const indexOfEvent = user.event_ids.indexOf(event_id);
+        const indexOfUser = event.participant_ids.indexOf(user_id);
+
+        if (indexOfUser !== -1 && indexOfEvent !== -1) {
+            event.participant_ids.splice(indexOfUser, 1);
+            user.event_ids.splice(indexOfEvent, 1);
+        } else {
+            event.participant_ids.push(user_id);
+            user.event_ids.push(event_id);
+        }
+
+        await Promise.all([
+            user.save(),
+            event.save()
+        ]);
+
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+/**
+ * @swagger
  * /api/event/import:
  *   post:
  *     summary: Import external event.
@@ -665,7 +744,7 @@ const deleteUserFromEvent = async (req, res) => {
 
         if (event) {
             const indexOfUser = event.participant_ids.indexOf(delete_user_id);
-            if (indexOfUser != -1) {
+            if (indexOfUser !== -1) {
                 event.participant_ids.splice(indexOfUser, 1);
                 await event.save();
             }
@@ -680,6 +759,7 @@ const deleteUserFromEvent = async (req, res) => {
 module.exports = {
     getEvents,
     getEvent,
+    toggleSubscribeEvent,
     importEvent,
     createEvent,
     updateEvent,
