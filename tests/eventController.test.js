@@ -244,5 +244,6 @@ describe("POST /api/event/import", () => {
 
 afterAll(async () => {
     await User.deleteOne({ email });
+    await User.deleteOne({ _id: newEventUser });
     await Event.deleteOne({ _id: import_event });
 });
