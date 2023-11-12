@@ -42,6 +42,7 @@ const userSchema = new Schema({
     },
     nfc_id: {
         type: String,
+        sparse: true,
         unique: true
     },
     profile_image: {

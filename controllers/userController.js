@@ -1,6 +1,8 @@
 // declare dependencies
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const mime = require('mime');
 
 // create jwt token
 const createToken = (_id) => {
@@ -72,10 +74,18 @@ const createToken = (_id) => {
  */
 const signupUser = async (req, res) => {
     const { first_name, last_name, role, city, age, sex, email, password } = req.body;
+    const profileImage = __dirname + "/../img/profilePic.png";
 
     try {
         const user = await User.signup(first_name, last_name, role, city, age, sex, email, password);
         const token = createToken(user._id);
+
+        const buffer = fs.readFileSync(profileImage);
+        const type = mime.getType(profileImage);
+        const base64Data = buffer.toString('base64');
+        const dataUri = `data:${type};base64,${base64Data}`;
+        await User.findOneAndUpdate({ email }, { profile_image: dataUri });
+
         res.status(200).json({email, token});
     } catch (error) {
         res.status(400).json({error: error.message});

@@ -14,6 +14,58 @@ function cleanUserObject(user) {
 
 /**
  * @swagger
+ * /api/profile/add-nfc:
+ *   get:
+ *     summary: Add NFC to the user.
+ *     tags:
+ *       - Profile
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: nfc_id
+ *         description: ID of NFC bracelet or card.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: NFC id successfully added to user.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "your-unique-user-id"
+ *               first_name: "TestUser"
+ *               last_name: "TestUser"
+ *               role: "leader"
+ *               city: "USA"
+ *               age: 20
+ *               sex: "male"
+ *               email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const addNFCIdToUser = async (req, res) => {
+    const user_id = req.user._id;
+    const nfc_id = req.body.nfc_id;
+
+    try {
+        await User.findByIdAndUpdate(user_id, { nfc_id });
+        const user = await User.findById(user_id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+/**
+ * @swagger
  * /api/profile:
  *   get:
  *     summary: Get user by nfc id.
@@ -317,6 +369,7 @@ const changePassword = async (req, res) => {
 
 module.exports = {
     getProfileByNFC,
+    addNFCIdToUser,
     getProfile,
     editProfile,
     addImage,

@@ -4,6 +4,7 @@ const multer = require("multer");
 const {
     getProfileByNFC,
     getProfile,
+    addNFCIdToUser,
     editProfile,
     addImage,
     changePassword
@@ -25,6 +26,8 @@ router.use(requireAuth);
 router.get("/", getProfile);
 // edit profile
 router.patch("/edit", editProfile);
+// add nfc to the user
+router.patch("/add-nfc", addNFCIdToUser);
 // add image to profile
 router.patch("/add-image", upload.single("profile_image"), addImage);
 // change password
