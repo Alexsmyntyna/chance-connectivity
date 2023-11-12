@@ -36,6 +36,47 @@ describe("GET /api/profile", () => {
     });
 });
 
+describe("PATCH /api/profile/add-nfc", () => {
+    it("should add nfc id to the user", async () => {
+        const response = await request(app)
+            .patch("/api/profile/add-nfc")
+            .set("Authorization", "Bearer " + token)
+            .send({
+                nfc_id: "testNFC"
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("first_name", "TestFirst");
+        expect(response.body).toHaveProperty("last_name", "TestLast");
+        expect(response.body).toHaveProperty("role", "leader");
+        expect(response.body).toHaveProperty("email", email);
+        expect(response.body).toHaveProperty("city", "CityTest");
+        expect(response.body).toHaveProperty("age", 18);
+        expect(response.body).toHaveProperty("sex", "male");
+        expect(response.body).toHaveProperty("nfc_id", "testNFC");
+    });
+});
+
+describe("POST /api/profile", () => {
+    it("should get user data by nfc id", async () => {
+        const response = await request(app)
+            .post("/api/profile")
+            .send({
+                nfc_id: "testNFC"
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("first_name", "TestFirst");
+        expect(response.body).toHaveProperty("last_name", "TestLast");
+        expect(response.body).toHaveProperty("role", "leader");
+        expect(response.body).toHaveProperty("email", email);
+        expect(response.body).toHaveProperty("city", "CityTest");
+        expect(response.body).toHaveProperty("age", 18);
+        expect(response.body).toHaveProperty("sex", "male");
+        expect(response.body).toHaveProperty("nfc_id", "testNFC");
+    });
+});
+
 describe("PATCH /api/profile/edit", () => {
     it("should edit profile information", async () => {
         email = generateRandomString() + "admin@admin.com";
@@ -58,6 +99,24 @@ describe("PATCH /api/profile/edit", () => {
         expect(response.body).toHaveProperty("city", "CityTest1");
         expect(response.body).toHaveProperty("age", 19);
         expect(response.body).toHaveProperty("sex", "female");
+    });
+});
+
+describe("PATCH /api/profile/add-image", () => {
+    it("should add image to the profile", async () => {
+        const response = await request(app)
+            .patch("/api/profile/add-image")
+            .set("Authorization", "Bearer " + token)
+            .attach("profile_image", __dirname + "/../img/profilePic.png");
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("first_name", "TestFirst1");
+        expect(response.body).toHaveProperty("last_name", "TestLast1");
+        expect(response.body).toHaveProperty("email", email);
+        expect(response.body).toHaveProperty("city", "CityTest1");
+        expect(response.body).toHaveProperty("age", 19);
+        expect(response.body).toHaveProperty("sex", "female");
+        expect(response.body).toHaveProperty("profile_image");
     });
 });
 

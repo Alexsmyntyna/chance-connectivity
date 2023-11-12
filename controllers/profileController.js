@@ -1,6 +1,5 @@
 // declare dependencies
 const User = require("../models/userModel");
-const validator = require("validator");
 
 async function findUserById(userId) {
     return await User.findById(userId);
@@ -12,6 +11,103 @@ function cleanUserObject(user) {
     delete cleanedUser.__v;
     return cleanedUser;
 }
+
+/**
+ * @swagger
+ * /api/profile/add-nfc:
+ *   get:
+ *     summary: Add NFC to the user.
+ *     tags:
+ *       - Profile
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: nfc_id
+ *         description: ID of NFC bracelet or card.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: NFC id successfully added to user.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "your-unique-user-id"
+ *               first_name: "TestUser"
+ *               last_name: "TestUser"
+ *               role: "leader"
+ *               city: "USA"
+ *               age: 20
+ *               sex: "male"
+ *               email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const addNFCIdToUser = async (req, res) => {
+    const user_id = req.user._id;
+    const nfc_id = req.body.nfc_id;
+
+    try {
+        await User.findByIdAndUpdate(user_id, { nfc_id });
+        const user = await User.findById(user_id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get user by nfc id.
+ *     tags:
+ *       - Profile
+ *     parameters:
+ *       - name: nfc_id
+ *         description: ID of NFC bracelet or card.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful receipt of user profile.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "your-unique-user-id"
+ *               first_name: "TestUser"
+ *               last_name: "TestUser"
+ *               role: "leader"
+ *               city: "USA"
+ *               age: 20
+ *               sex: "male"
+ *               email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const getProfileByNFC = async (req, res) => {
+    const nfc_id = req.body.nfc_id;
+
+    try {
+        const user = await User.findOne({ nfc_id: nfc_id }).select(["-password", "-__v"]);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
 /**
  * @swagger
@@ -140,6 +236,67 @@ const editProfile = async (req, res) => {
 
 /**
  * @swagger
+ * /api/profile/add-image:
+ *   patch:
+ *     summary: Add image profile to the authorized user.
+ *     tags:
+ *       - Profile
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: profile_image
+ *         description: Image of profile.
+ *         in: formData
+ *         required: false
+ *         type: file
+ *     responses:
+ *       200:
+ *         description: Successful addition of an image.
+ *         content:
+ *           application/json:
+ *             example:
+ *               _id: "your-unique-user-id"
+ *               first_name: "TestUser"
+ *               last_name: "TestUser"
+ *               role: "leader"
+ *               city: "New York"
+ *               age: 20
+ *               sex: "male"
+ *               email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const addImage = async (req, res) => {
+    const user_id = req.user;
+
+    try {
+        const uploadedFile = req.file;
+
+        if (!uploadedFile) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const base64Data = uploadedFile.buffer.toString('base64');
+        const dataUri = `data:${uploadedFile.mimetype};base64,${base64Data}`;
+
+        await User.findOneAndUpdate(user_id, { profile_image: dataUri });
+        const data = await User.findById(user_id).select(["-password", "-__v"]);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+/**
+ * @swagger
  * /api/profile/change-password:
  *   patch:
  *     summary: Change authorized user password.
@@ -211,7 +368,10 @@ const changePassword = async (req, res) => {
 
 
 module.exports = {
+    getProfileByNFC,
+    addNFCIdToUser,
     getProfile,
     editProfile,
+    addImage,
     changePassword
 };

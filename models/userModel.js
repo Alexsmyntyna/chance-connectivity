@@ -33,11 +33,20 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
         required: true
+    },
+    nfc_id: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    profile_image: {
+        type: String
     },
     event_ids: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }]
