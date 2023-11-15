@@ -13,9 +13,11 @@ const {
     getAllUsersOfEvent,
     deleteUserFromEvent
 } = require("../controllers/eventController");
+const corsHeader = require("../middleware/corsHeaders");
 
 const router = express.Router();
 
+router.use(corsHeader);
 router.use(requireAuth);
 
 // get events
