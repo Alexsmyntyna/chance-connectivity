@@ -12,6 +12,17 @@ function cleanUserObject(user) {
     return cleanedUser;
 }
 
+function generateString(length) {
+    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = ' ';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
+
 /**
  * @swagger
  * /api/profile/add-nfc:
@@ -56,8 +67,13 @@ const addNFCIdToUser = async (req, res) => {
     const nfc_id = req.body.nfc_id;
 
     try {
-        await User.findByIdAndUpdate(user_id, { nfc_id });
         const user = await User.findById(user_id);
+        if (user.nfc_id !== nfc_id) {
+            await User.findOneAndUpdate({ nfc_id }, { nfc_id: generateString(6) });
+
+            user.nfc_id = nfc_id;
+            await user.save();
+        }
         res.status(200).json(user);
     } catch (error) {
         res.status(400).json({ error: error.message });
