@@ -6,6 +6,7 @@ const swaggerSpec = require('./swagger');
 const userRoutes = require("./routes/user");
 const profileRoutes = require("./routes/profile");
 const eventRoutes = require("./routes/event");
+const orderRoutes = require("./routes/order");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/user", userRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/event", eventRoutes);
+app.use("/api/order", orderRoutes);
 
 // trying to connect to db & starting server
 mongoose.connect(process.env.MONGODB)
