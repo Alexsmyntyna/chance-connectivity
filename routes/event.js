@@ -6,7 +6,6 @@ const {
     getEvents,
     getEvent,
     toggleSubscribeEvent,
-    importEvent,
     updateEvent,
     deleteEvent,
     addNewUser,
@@ -24,8 +23,6 @@ router.use(requireAuth);
 router.get("/", getEvents);
 // get exact event
 router.get("/:id", getEvent);
-// import event
-router.post("/import", importEvent);
 // subscribe to the event
 router.patch("/subscribe/:id", toggleSubscribeEvent);
 // add new user to event

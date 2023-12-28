@@ -223,27 +223,7 @@ describe("DELETE /api/event/delete/event_id", () => {
     });
 });
 
-describe("POST /api/event/import", () => {
-    it("should import external event", async () => {
-        const response = await request(app)
-            .post("/api/event/import")
-            .set("Authorization", "Bearer " + token)
-            .send({
-                url: "https://book.chanceyouth.org/api/camps/4",
-                country: "Belarus"
-            });
-
-        global.import_event = response.body._id;
-
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("event_name", "Winter Retreat 2023");
-        expect(response.body).toHaveProperty("country", "Belarus");
-        expect(response.body).toHaveProperty("user_id", user_id);
-    });
-});
-
 afterAll(async () => {
     await User.deleteOne({ email });
     await User.deleteOne({ _id: newEventUser });
-    await Event.deleteOne({ _id: import_event });
 });
