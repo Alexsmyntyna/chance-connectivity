@@ -31,6 +31,11 @@ const userSchema = new Schema({
         required: true,
         enum: ["male", "female"]
     },
+    balance: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     email: {
         type: String,
         required: true,

@@ -1,5 +1,7 @@
 // declare dependencies
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 /**
  * @swagger
@@ -19,6 +21,11 @@ const Order = require("../models/orderModel");
  *         in: formData
  *         required: true
  *         type: string
+ *       - name: amount
+ *         description: Order price.
+ *         in: formData
+ *         required: true
+ *         type: integer
  *     responses:
  *       200:
  *         description: Successful order creation.
@@ -43,10 +50,27 @@ const Order = require("../models/orderModel");
 const createOrder = async (req, res) => {
     const user_id = req.user._id;
     const order_name = req.body.order_name;
+    const amount = req.body.amount;
 
     try {
+        const user = await User.findById(user_id);
+        let paymentIntent = {};
+        if (user.balance >= amount) {
+            user.balance -= amount;
+            await user.save();
+        } else {
+            const change = amount - user.balance;
+            paymentIntent = await stripe.paymentIntents.create({
+                amount: change * 100,
+                currency: 'usd',
+                automatic_payment_methods: {
+                    enabled: true,
+                },
+            });
+        }
+        
         const order = await Order.createOrder(user_id, order_name);
-        res.status(201).json(order);
+        res.status(201).json({ order, stripePayment: paymentIntent });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
