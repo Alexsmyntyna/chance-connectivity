@@ -54,23 +54,24 @@ const createOrder = async (req, res) => {
 
     try {
         const user = await User.findById(user_id);
-        let paymentIntent = {};
+        let stripe_id = "";
+        let client_secret = "";
         if (user.balance >= amount) {
             user.balance -= amount;
             await user.save();
         } else {
             const change = amount - user.balance;
-            paymentIntent = await stripe.paymentIntents.create({
-                amount: change * 100,
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: change,
                 currency: 'usd',
-                automatic_payment_methods: {
-                    enabled: true,
-                },
+                payment_method_types: ['cashapp'],
             });
+            stripe_id = paymentIntent.id;
+            client_secret = paymentIntent.client_secret;
         }
-        
-        const order = await Order.createOrder(user_id, order_name);
-        res.status(201).json({ order, stripePayment: paymentIntent });
+
+        const order = await Order.createOrder(user_id, order_name, stripe_id, client_secret);
+        res.status(201).json(order);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -117,7 +118,7 @@ const createOrder = async (req, res) => {
  */
 const getOrders = async (req, res) => {
     try {
-        const orders = await Order.where({ is_complete: false }).sort('+createdAt');
+        const orders = await Order.where({ is_complete: false, status_payment: "ok" }).sort('+updatedAt');
         res.status(200).json({ orders });
     } catch (error) {
         res.status(400).json({ error: error.message });
