@@ -29,20 +29,22 @@ describe("POST /api/order/create", () => {
             .set("Authorization", "Bearer " + token)
             .send({
                 order_name: "Latte",
-                amount: 2
+                amount: 200
             });
 
         expect(response.status).toBe(201);
-        expect(response.body.order).toHaveProperty("user_id", user_id);
-        expect(response.body.order).toHaveProperty("first_name", "TestFirst");
-        expect(response.body.order).toHaveProperty("last_name", "TestLast");
-        expect(response.body.order).toHaveProperty("order_name", "Latte");
-        expect(response.body.order).toHaveProperty("is_complete", false);
-        expect(response.body.order).toHaveProperty("_id");
-        expect(response.body.order).toHaveProperty("createdAt");
-        expect(response.body.order).toHaveProperty("updatedAt");
-        expect(response.body.stripePayment).toHaveProperty("amount", 200);
-        global.order_id = response.body.order._id;
+        expect(response.body).toHaveProperty("user_id", user_id);
+        expect(response.body).toHaveProperty("first_name", "TestFirst");
+        expect(response.body).toHaveProperty("last_name", "TestLast");
+        expect(response.body).toHaveProperty("order_name", "Latte");
+        expect(response.body).toHaveProperty("is_complete", false);
+        expect(response.body).toHaveProperty("_id");
+        expect(response.body).toHaveProperty("status_payment", "pending");
+        expect(response.body).toHaveProperty("stripe_id");
+        expect(response.body).toHaveProperty("client_secret");
+        expect(response.body).toHaveProperty("createdAt");
+        expect(response.body).toHaveProperty("updatedAt");
+        global.order_id = response.body._id;
     });
 });
 
