@@ -382,6 +382,16 @@ const changePassword = async (req, res) => {
     }
 }
 
+const updateBalance = async (req, res) => {
+    const amount = req.params.amount;
+
+    try {
+        const userList = await User.updateBalance(amount);
+        res.status(200).json(userList);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
 
 module.exports = {
     getProfileByNFC,
@@ -389,5 +399,6 @@ module.exports = {
     getProfile,
     editProfile,
     addImage,
-    changePassword
+    changePassword,
+    updateBalance
 };
