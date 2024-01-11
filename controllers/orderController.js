@@ -169,6 +169,11 @@ const successPayment = async (req, res) => {
         const order = await Order.findOne({ stripe_id, client_secret });
         order.status_payment = "ok";
         await order.save();
+
+        const user = await User.findById(order.user_id);
+        user.balance = 0;
+        await user.save();
+
         order.stripe_id = "";
         res.status(200).json(order);
     } catch(error) {
