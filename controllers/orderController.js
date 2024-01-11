@@ -131,7 +131,7 @@ const getOrders = async (req, res) => {
 
 /**
  * @swagger
- * /api/order/payment/success":
+ * /api/order/payment/success:
  *   post:
  *     summary: Payment has been successfully done.
  *     tags:
