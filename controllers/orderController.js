@@ -119,8 +119,59 @@ const createOrder = async (req, res) => {
 const getOrders = async (req, res) => {
     try {
         const orders = await Order.where({ is_complete: false, status_payment: "ok" }).sort('+updatedAt');
-        res.status(200).json({ orders });
+        const sanitizedOrders = orders.map(order => {
+            const { stripe_id, ...sanitizedOrder } = order.toObject(); // Assuming Mongoose model, adjust accordingly
+            return sanitizedOrder;
+        });
+        res.status(200).json({ sanitizedOrders });
     } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+/**
+ * @swagger
+ * /api/order/payment/success":
+ *   post:
+ *     summary: Payment has been successfully done.
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: stripe_id
+ *         description: Stripe id.
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: client_secret
+ *         description: Client secret.
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful order creation.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mssg: "Order `Your order name` completed"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ */
+const successPayment = async (req, res) => {
+    const stripe_id = req.body.stripe_id;
+    const client_secret = req.body.client_secret;
+
+    try {
+        const order = await Order.findOne({ stripe_id, client_secret });
+        order.status_payment = "ok";
+        await order.save();
+        order.stripe_id = "";
+        res.status(200).json(order);
+    } catch(error) {
         res.status(400).json({ error: error.message });
     }
 }
@@ -129,7 +180,7 @@ const getOrders = async (req, res) => {
  * @swagger
  * /api/order/complete/{id}:
  *   post:
- *     summary: Compl.
+ *     summary: Complete order.
  *     tags:
  *       - Orders
  *     parameters:
@@ -179,5 +230,6 @@ const completeOrder = async (req, res) => {
 module.exports = {
     createOrder,
     getOrders,
+    successPayment,
     completeOrder
 };

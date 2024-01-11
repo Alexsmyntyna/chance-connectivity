@@ -94,7 +94,8 @@ userSchema.statics.signup = async function (first_name, last_name, role, city, a
         age,
         sex,
         email, 
-        password: hash
+        password: hash,
+        balance: 0
     });
 }
 
@@ -119,6 +120,11 @@ userSchema.statics.login = async function(email, password) {
     }
     
     return user;
+}
+
+userSchema.statics.updateBalance = async function() {
+    const userList = await this.updateMany({ balance: { $gte: 0 } }, { balance: 1000 });
+    return userList;
 }
 
 module.exports = mongoose.model("User", userSchema);
