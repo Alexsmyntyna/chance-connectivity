@@ -122,8 +122,8 @@ userSchema.statics.login = async function(email, password) {
     return user;
 }
 
-userSchema.statics.updateBalance = async function(amount = 1000) {
-    const userList = await this.updateMany({ balance: { $gte: 0 } }, { balance: amount });
+userSchema.statics.updateBalance = async function() {
+    const userList = await this.updateMany({ balance: { $gte: 0 } }, { balance: 1000 });
     return userList;
 }
 

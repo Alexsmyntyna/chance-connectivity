@@ -382,11 +382,31 @@ const changePassword = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /api/profile/update-balance:
+ *   post:
+ *     summary: Update balances of all users to 1000 (cents).
+ *     tags:
+ *       - Profile
+ *     parameters:
+ *     responses:
+ *       200:
+ *         description: Password changed successfully.
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Your password has been successfully changed!"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Something went wrong"
+ */
 const updateBalance = async (req, res) => {
-    const amount = req.params.amount;
-
     try {
-        const userList = await User.updateBalance(amount);
+        const userList = await User.updateBalance();
         res.status(200).json(userList);
     } catch (error) {
         res.status(400).json({ error: error.message });

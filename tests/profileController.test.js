@@ -74,6 +74,7 @@ describe("POST /api/profile", () => {
         expect(response.body).toHaveProperty("age", 18);
         expect(response.body).toHaveProperty("sex", "male");
         expect(response.body).toHaveProperty("nfc_id", "testNFC");
+        expect(response.body).toHaveProperty("balance", 0);
     });
 });
 

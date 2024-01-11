@@ -50,7 +50,9 @@ orderSchema.statics.createOrder = async function (user_id, order_name, stripe_id
         client_secret,
         status_payment,
     };
-    return await this.create(data);
+    let result = await this.create(data);
+    result.stripe_id = "";
+    return result;
 }
 
 module.exports = mongoose.model("Order", orderSchema);

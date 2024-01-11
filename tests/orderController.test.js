@@ -40,7 +40,7 @@ describe("POST /api/order/create", () => {
         expect(response.body).toHaveProperty("is_complete", false);
         expect(response.body).toHaveProperty("_id");
         expect(response.body).toHaveProperty("status_payment", "pending");
-        expect(response.body).toHaveProperty("stripe_id");
+        expect(response.body).toHaveProperty("stripe_id", "");
         expect(response.body).toHaveProperty("client_secret");
         expect(response.body).toHaveProperty("createdAt");
         expect(response.body).toHaveProperty("updatedAt");

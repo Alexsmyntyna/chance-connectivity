@@ -34,6 +34,6 @@ router.patch("/add-image", upload.single("profile_image"), addImage);
 // change password
 router.patch("/change-password", changePassword);
 // update balance
-router.post("/update-balance/:amount", updateBalance);
+router.post("/update-balance", updateBalance);
 
 module.exports = router;
