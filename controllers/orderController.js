@@ -56,11 +56,12 @@ const createOrder = async (req, res) => {
         const user = await User.findById(user_id);
         let stripe_id = "";
         let client_secret = "";
+        let change = 0;
         if (user.balance >= amount) {
             user.balance -= amount;
             await user.save();
         } else {
-            const change = amount - user.balance;
+            change = amount - user.balance;
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: change,
                 currency: 'usd',
@@ -70,7 +71,7 @@ const createOrder = async (req, res) => {
             client_secret = paymentIntent.client_secret;
         }
 
-        const order = await Order.createOrder(user_id, order_name, stripe_id, client_secret);
+        const order = await Order.createOrder(user_id, order_name, change, stripe_id, client_secret);
         res.status(201).json(order);
     } catch (error) {
         res.status(400).json({ error: error.message });
