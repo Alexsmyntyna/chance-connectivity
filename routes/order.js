@@ -8,6 +8,7 @@ const {
     completeOrder
 } = require("../controllers/orderController");
 const corsHeader = require("../middleware/corsHeaders");
+const isAdminRole = require("../middleware/isAdminRole");
 
 const router = express.Router();
 
@@ -15,13 +16,13 @@ router.use(corsHeader);
 
 // success payment
 router.post("/payment/success", successPayment);
-// get orders
-router.get("/", getOrders);
-
 router.use(requireAuth);
+router.use(isAdminRole);
 
 // create order
 router.post("/create", createOrder);
+// get orders
+router.get("/", getOrders);
 // complete corder
 router.post("/complete/:id", completeOrder);
 
