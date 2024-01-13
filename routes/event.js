@@ -13,6 +13,7 @@ const {
     deleteUserFromEvent
 } = require("../controllers/eventController");
 const corsHeader = require("../middleware/corsHeaders");
+const isAdminRole = require("../middleware/isAdminRole");
 
 const router = express.Router();
 
@@ -25,6 +26,9 @@ router.get("/", getEvents);
 router.get("/:id", getEvent);
 // subscribe to the event
 router.patch("/subscribe/:id", toggleSubscribeEvent);
+
+router.use(isAdminRole);
+
 // add new user to event
 router.patch("/:id/add-user", addNewUser);
 // get all users of events
