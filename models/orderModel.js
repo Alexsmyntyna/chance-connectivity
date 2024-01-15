@@ -46,23 +46,17 @@ const orderSchema = new Schema({
     }
 }, {timestamps: true});
 
-orderSchema.statics.createOrder = async function (user_id, order_name, order_price, stripe_id = "", client_secret = "") {
-    const userObj = await User.findById(user_id);
+orderSchema.statics.createOrder = async function (user, order_name, order_price, stripe_id = "", client_secret = "") {
     const lastOrder = await this.find().sort("-createdAt").limit(1);
-    let lastOrderNumber;
-    if (!lastOrder) {
-        lastOrderNumber = 1;
-    } else {
-        lastOrderNumber = lastOrder[0].order_number;
-    }
+    let lastOrderNumber = lastOrder?.[0]?.order_number ?? 1;
     if (lastOrderNumber === undefined) {
         return "Order number not found";
     }
     const status_payment = (stripe_id != "" && client_secret != "") ? "pending" : "ok";
     const data = {
-        user_id,
-        first_name: userObj.first_name,
-        last_name: userObj.last_name,
+        user_id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
         order_name,
         order_number: lastOrderNumber + 1,
         order_price,

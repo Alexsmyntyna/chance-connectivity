@@ -49,29 +49,31 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
  */
 const createOrder = async (req, res) => {
     const user_id = req.user._id;
-    const order_name = req.body.order_name;
-    const amount = req.body.amount;
+    const { order_name, amount } = req.body;
 
     try {
         const user = await User.findById(user_id);
+
         let stripe_id = "";
         let client_secret = "";
         let change = 0;
+        let paymentIntentStatus = "";
+
         if (user.balance >= amount) {
             user.balance -= amount;
             await user.save();
         } else {
             change = amount - user.balance;
-            const paymentIntent = await stripe.paymentIntents.create({
+            const paymentCreate = await stripe.paymentIntents.create({
                 amount: change,
                 currency: 'usd',
                 payment_method_types: ['cashapp'],
             });
-            stripe_id = paymentIntent.id;
-            client_secret = paymentIntent.client_secret;
+            stripe_id = paymentCreate.id;
+            client_secret = paymentCreate.client_secret;
         }
 
-        const order = await Order.createOrder(user_id, order_name, change, stripe_id, client_secret);
+        const order = await Order.createOrder(user, order_name, change, stripe_id, client_secret);
         res.status(201).json(order);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -163,10 +165,16 @@ const getOrders = async (req, res) => {
  *               error: "You have an error"
  */
 const successPayment = async (req, res) => {
-    const stripe_id = req.body.stripe_id;
-    const client_secret = req.body.client_secret;
+    const { stripe_id, client_secret } = req.body;
 
     try {
+
+        const paymentIntent = await stripe.paymentIntents.retrieve(stripe_id);
+        paymentIntentStatus = paymentIntent.status;
+        if(paymentIntentStatus != "succeeded") {
+            res.status(400).json({ error: "Your payment failed" });
+        }
+
         const order = await Order.findOne({ stripe_id, client_secret });
         order.status_payment = "ok";
         await order.save();
