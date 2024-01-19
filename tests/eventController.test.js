@@ -204,6 +204,31 @@ describe("PATCH /api/event/subscribe/event_id", () => {
     });
 });
 
+describe("GET /api/event/event_id/cafe-open", () => {
+    it("should get status of cafe", async () => {
+        const response = await request(app)
+            .get("/api/event/" + event_id + "/cafe-open")
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("mssg", false);
+    });
+});
+
+describe("POST /api/event/event_id/cafe-toggle", () => {
+    it("should change status of cafe", async () => {
+        const response = await request(app)
+            .post("/api/event/" + event_id + "/cafe-toggle")
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("_id", event_id);
+        expect(response.body).toHaveProperty("event_name", "TestEvent1");
+        expect(response.body).toHaveProperty("country", "TestCountry1");
+        expect(response.body).toHaveProperty("is_cafe_open", true);
+    });
+});
+
 describe("DELETE /api/event/delete/event_id", () => {
     it("should delete event", async () => {
         const response = await request(app)

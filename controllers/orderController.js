@@ -126,7 +126,7 @@ const getOrders = async (req, res) => {
             const { stripe_id, ...sanitizedOrder } = order.toObject(); // Assuming Mongoose model, adjust accordingly
             return sanitizedOrder;
         });
-        res.status(200).json({ sanitizedOrders });
+        res.status(200).json({ orders: sanitizedOrders });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

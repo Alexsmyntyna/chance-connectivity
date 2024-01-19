@@ -58,6 +58,9 @@ const eventSchema = new Schema({
     },
     participant_ids: {
         type:  [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    },
+    is_cafe_open: {
+        type: Boolean
     }
 });
 
@@ -96,6 +99,7 @@ eventSchema.statics.createEvent = async function (event_name, country, start_dat
         start_date: validateData.start_date,
         end_date: validateData.end_date,
         user_id,
+        is_cafe_open: false
     };
 
     if (fields) {

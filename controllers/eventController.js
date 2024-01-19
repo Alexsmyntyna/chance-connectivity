@@ -1,4 +1,5 @@
 // declare dependencies
+const eventModel = require("../models/eventModel");
 const Event = require("../models/eventModel");
 const User = require("../models/userModel");
 const axios = require("axios");
@@ -688,6 +689,122 @@ const deleteUserFromEvent = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /api/event/{id}/cafe-open:
+ *   get:
+ *     summary: Get is cafe open status.
+ *     tags:
+ *       - Events
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: id
+ *         description: ID of event.
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful getting open cafe status.
+ *         content:
+ *           application/json:
+ *             example:
+ *               usersList:
+ *                    - _id: "your-unique-user-id"
+ *                      first_name: "TestUser"
+ *                      last_name: "TestUser"
+ *                      role: "leader"
+ *                      city: "USA"
+ *                      age: 20
+ *                      sex: "male"
+ *                      email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ *       404:
+ *         description: Event has not found.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Event has not found"
+ */
+const isCafeOpen = async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        const isOpen = event.is_cafe_open;
+        res.status(200).json({ mssg: isOpen });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+/**
+ * @swagger
+ * /api/event/{id}/cafe-toggle:
+ *   post:
+ *     summary: Toggle open status cafe.
+ *     tags:
+ *       - Events
+ *     parameters:
+ *       - name: Authorization
+ *         description: Authorization bearer token (Bearer your-token).
+ *         in: header
+ *         required: true
+ *         type: string
+ *       - name: id
+ *         description: ID of event.
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Successful changing cafe open status.
+ *         content:
+ *           application/json:
+ *             example:
+ *               usersList:
+ *                    - _id: "your-unique-user-id"
+ *                      first_name: "TestUser"
+ *                      last_name: "TestUser"
+ *                      role: "leader"
+ *                      city: "USA"
+ *                      age: 20
+ *                      sex: "male"
+ *                      email: "test@test.com"
+ *       400:
+ *         description: Something went wrong.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "You have an error"
+ *       404:
+ *         description: Event has not found.
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Event has not found"
+ */
+const toggleCafe = async (req, res) => {
+    const user = req.user._id;
+    
+    try {
+        const event = await Event.findById(req.params.id);
+        const statusOpen = !event.is_cafe_open;
+        event.is_cafe_open = statusOpen;
+        await event.save();
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getEvents,
     getEvent,
@@ -697,5 +814,7 @@ module.exports = {
     deleteEvent,
     addNewUser,
     getAllUsersOfEvent,
-    deleteUserFromEvent
+    deleteUserFromEvent,
+    isCafeOpen,
+    toggleCafe
 };
