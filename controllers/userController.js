@@ -3,6 +3,8 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const mime = require('mime');
+const postgres = require("../config/transfer");
+const sendTelegramMessage = require("../services/sendMessage");
 
 // create jwt token
 const createToken = (_id) => {
@@ -137,7 +139,49 @@ const signinUser = async (req, res) => {
     }
 };
 
+const sendingMessages = async (req, res) => {
+
+    const users = await User.find({ chat_id: { $ne: null } });
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const processItems = async () => {
+        for (let i = 0; i < users.length; i++) {
+
+            const login = users[i].login;
+            const password = users[i].password_temp;
+
+            const message = `Login - ${login}, password - ${password}`;
+
+            sendTelegramMessage(message, users[i].chat_id)
+                .then((result) => {
+                    console.log(result);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            await delay(200);
+        }
+    };
+
+    await processItems();
+
+    res.status(200).json({ mssg: "Sending messages finished" });
+}
+
+const transferUsers = async (req, res) => {
+    try {
+        const result = await postgres.query('SELECT * FROM retreat_user WHERE camp_id=6 AND email IS NOT NULL;');
+        const insert = await User.transferUsers(result.rows);
+        res.status(200).json(insert);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 module.exports = {
     signupUser,
-    signinUser
+    signinUser,
+    transferUsers,
+    sendingMessages
 };
