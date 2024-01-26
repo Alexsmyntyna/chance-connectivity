@@ -121,7 +121,7 @@ const createOrder = async (req, res) => {
  */
 const getOrders = async (req, res) => {
     try {
-        const orders = await Order.where({ is_complete: false, status_payment: "ok" }).sort('+updatedAt');
+        const orders = await Order.where({ status_payment: "ok" }).sort('+updatedAt');
         const sanitizedOrders = orders.map(order => {
             const { stripe_id, ...sanitizedOrder } = order.toObject(); // Assuming Mongoose model, adjust accordingly
             return sanitizedOrder;
