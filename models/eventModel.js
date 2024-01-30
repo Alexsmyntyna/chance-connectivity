@@ -61,8 +61,29 @@ const eventSchema = new Schema({
     },
     is_cafe_open: {
         type: Boolean
-    }
+    },
+    advertisement_images: [{
+        link: {
+            type: String,
+            required: true,
+        },
+        description: {
+            type: String,
+        },
+    }],
+    event_images: [{
+        link: {
+            type: String,
+            required: true,
+        },
+        matched_face: {
+            type: [String],
+        },
+    }],
 });
+
+
+
 
 function validateFields(event_name, country, start_date, end_date, user_id) {
     if (!event_name || !country || !start_date || !end_date || !user_id) {

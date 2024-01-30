@@ -48,8 +48,8 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
  *               error: "You have an error"
  */
 const createOrder = async (req, res) => {
-    const user_id = req.user._id;
-    const { order_name, amount } = req.body;
+    
+    const { order_name, amount, user_id } = req.body;
 
     try {
         const user = await User.findById(user_id);
