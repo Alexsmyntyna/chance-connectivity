@@ -13,8 +13,16 @@ const app = express();
 // add base middleware
 app.use(express.json());
 
+// log network requests
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
 // swagger route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
 // routes
 app.use("/api/user", userRoutes);
 app.use("/api/profile", profileRoutes);

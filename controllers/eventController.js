@@ -42,7 +42,7 @@ const getEvents = async (req, res) => {
     const user_id = req.user._id;
 
     try {
-        const events = await Event.where({ user_id }).select(["-__v"]);
+        const events = await Event.where({ user_id }).select(["-__v"]).populate("participant_ids");
         res.status(200).json({events});
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -610,7 +610,7 @@ const getAllUsersOfEvent = async (req, res) => {
         const event = await Event.findOne({ _id: req.params.id, user_id });
 
         if (event) {
-            const usersList = await User.find({ _id: { $in: event.participant_ids } });
+            const usersList = await User.find({ _id: { $in: event.participant_ids } }).populate("participant_ids");
             res.status(200).json({ usersList });
         }
         res.status(404).json({ message: "Event has not found" });
