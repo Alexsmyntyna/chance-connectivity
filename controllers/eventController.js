@@ -805,6 +805,28 @@ const toggleCafe = async (req, res) => {
     }
 }
 
+const addUsersToEvent = async (req, res) => {
+
+    const event_id = req.params.id;
+
+    try {
+
+        const users = await User.find({});
+        const event = await Event.findById(event_id);
+
+        if (!event) {
+            res.status(400).json({ error: "Event not found"});
+        }
+
+        event.participant_ids = users.map(user => user._id);
+        await event.save();
+        
+        res.status(200).json( event );
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getEvents,
     getEvent,
@@ -816,5 +838,6 @@ module.exports = {
     getAllUsersOfEvent,
     deleteUserFromEvent,
     isCafeOpen,
-    toggleCafe
+    toggleCafe,
+    addUsersToEvent
 };
