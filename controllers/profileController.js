@@ -63,7 +63,7 @@ function generateString(length) {
  *               error: "You have an error"
  */
 const addNFCIdToUser = async (req, res) => {
-    const user_id = req.user._id;
+    const user_id = req.body.userId;
     const nfc_id = req.body.nfc_id;
 
     try {
@@ -73,6 +73,7 @@ const addNFCIdToUser = async (req, res) => {
 
             user.nfc_id = nfc_id;
             await user.save();
+
         }
         res.status(200).json(user);
     } catch (error) {
