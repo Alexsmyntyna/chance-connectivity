@@ -12,7 +12,8 @@ const {
     getAllUsersOfEvent,
     deleteUserFromEvent,
     isCafeOpen,
-    toggleCafe
+    toggleCafe,
+    addUsersToEvent
 } = require("../controllers/eventController");
 const corsHeader = require("../middleware/corsHeaders");
 const isAdminRole = require("../middleware/isAdminRole");
@@ -31,6 +32,8 @@ router.patch("/subscribe/:id", toggleSubscribeEvent);
 
 router.use(isAdminRole);
 
+// add all users to event
+router.post("/:id/add-users", addUsersToEvent);
 // is cafe open
 router.get("/:id/cafe-open", isCafeOpen);
 // toggle cafe

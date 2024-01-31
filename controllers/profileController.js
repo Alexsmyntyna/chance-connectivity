@@ -119,10 +119,9 @@ const addNFCIdToUser = async (req, res) => {
  *               error: "You have an error"
  */
 const getProfileByNFC = async (req, res) => {
-    const nfc_id = req.body.nfc_id;
+    const { nfc_id } = req.body;
     if(nfc_id === undefined) {
         res.status(400).json({ error: "NFC_ID is not defined" });
-        return;
     }
     try {
         const user = await User.findOne({ nfc_id: nfc_id }).select(["-password", "-__v"]);
