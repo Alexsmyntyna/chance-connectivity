@@ -67,7 +67,10 @@ const addNFCIdToUser = async (req, res) => {
     const nfc_id = req.body.nfc_id;
 
     try {
-        const user = await User.findById(user_id);
+        const user = await User.findById({_id: user_id});
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
         if (user.nfc_id !== nfc_id) {
             await User.findOneAndUpdate({ nfc_id }, { nfc_id: generateString(6) });
 
