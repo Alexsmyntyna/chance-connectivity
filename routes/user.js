@@ -4,7 +4,8 @@ const {
     signupUser,
     signinUser,
     transferUsers,
-    sendingMessages
+    sendingMessages,
+    getTokenByNFC
 } = require("../controllers/userController");
 const corsHeader = require("../middleware/corsHeaders");
 
@@ -21,5 +22,7 @@ router.post("/signin", signinUser);
 router.post("/transfer", transferUsers);
 // sending messages
 router.post("/send", sendingMessages);
+// get token by nfc_id
+router.post("/get-token", getTokenByNFC);
 
 module.exports = router;
