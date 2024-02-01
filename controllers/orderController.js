@@ -2,6 +2,7 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
+const orderEnum = require("../enums/orderEnum");
 
 /**
  * @swagger
@@ -48,16 +49,19 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
  *               error: "You have an error"
  */
 const createOrder = async (req, res) => {
-    
-    const { order_name, amount, user_id } = req.body;
+
+    const user_id = req.user._id;
+    const { order_name } = req.body;
 
     try {
+        const name = (order_name.split(", ")[0]).toUpperCase();
+        const amount = orderEnum[name] ?? res.status(400).json({ error: "Wrong drink type" });
+
         const user = await User.findById(user_id);
 
         let stripe_id = "";
         let client_secret = "";
         let change = 0;
-        let paymentIntentStatus = "";
 
         if (user.balance >= amount) {
             user.balance -= amount;
