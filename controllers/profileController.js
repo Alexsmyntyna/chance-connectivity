@@ -125,7 +125,9 @@ const getProfileByNFC = async (req, res) => {
     }
     try {
         const user = await User.findOne({ nfc_id: nfc_id }).select(["-password", "-__v"]);
-        console.log("Found User: ", user._id , user.first_name)
+        if(user == null) {
+            res.status(400).json({ error: "user not found" });
+        }
         res.status(200).json(user);
     } catch (error) {
         res.status(400).json({ error: error.message });
