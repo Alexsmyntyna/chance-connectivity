@@ -181,18 +181,26 @@ const transferUsers = async (req, res) => {
 
 const getTokenByNFC = async(req, res) => {
     const { nfc_id } = req.body;
+    console.log(`Request for NFC ID: ${nfc_id}`); // because knowing what you're looking for is half the battle
 
     try {
+        console.log(`Searching for user with NFC ID: ${nfc_id}`); // anticipation, thrilling
         const user = await User.findOne({ nfc_id });
         if (user == null) {
+            console.error(`User not found for NFC ID: ${nfc_id}`); // surprise, user doesn't exist
             res.status(400).json({ error: "user not found" });
+            return; // stop! hammer time, because why continue
         }
+        console.log(`User found: ${user.email}, preparing auth token...`); // excitement, a user exists
         const authToken = createToken(user._id);
+        console.log(`Token created for user: ${user.email}`); // achievement, you did something right
         res.status(200).json({ email: user.email, authToken });
     } catch (error) {
+        console.error(`Error fetching user with NFC ID: ${nfc_id}`, error); // drama, something broke
         res.status(400).json({ error: error.message });
     }
 }
+
 
 module.exports = {
     signupUser,
