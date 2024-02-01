@@ -179,9 +179,25 @@ const transferUsers = async (req, res) => {
     }
 };
 
+const getTokenByNFC = async(req, res) => {
+    const { nfc_id } = req.body;
+
+    try {
+        const user = await User.findOne({ nfc_id });
+        if (user == null) {
+            res.status(400).json({ error: "user not found" });
+        }
+        const authToken = createToken(user._id);
+        res.status(200).json({ email: user.email, authToken });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
 module.exports = {
     signupUser,
     signinUser,
     transferUsers,
-    sendingMessages
+    sendingMessages,
+    getTokenByNFC
 };
